@@ -1,5 +1,4 @@
-import { async } from 'regenerator-runtime';
-import { ValidationError } from 'sequelize';
+import { ValidationError } from '../helpers/errors.helper';
 import customExtService from '../services/customExt.service';
 import fixedExtService from '../services/fixedExt.service';
 
@@ -38,13 +37,25 @@ export default {
   },
 
   // 차단된 확장자 추가
-  blockExt: async (req, res) => {
+  blockExt: async (req, res, next) => {
     const { name } = req.body;
 
-    let ext = await customExtService.findOneCustomExt(name);
+    // 최대 갯수 검사
+    const count = await customExtService.countAllCustomExt();
+    if (count >= 200) {
+      throw new ValidationError('최대 갯수를 초과 하였습니다.', 4001);
+    }
 
+    // 고정 확장자에 존재하는지 검사
+    let ext = await fixedExtService.findOneFixedExt(name);
     if (ext) {
-      throw new ValidationError('이미 존재하는 확장자입니다.', 4001);
+      throw new ValidationError('고정 확장자 입니다', 4002);
+    }
+
+    // 커스텀 중복 검사
+    ext = await customExtService.findOneCustomExt(name);
+    if (ext) {
+      throw new ValidationError('이미 존재하는 확장자입니다.', 4003);
     }
 
     ext = await customExtService.createCustomExt(name);
@@ -60,7 +71,6 @@ export default {
   // 차단된 확장자 삭제
   deleteExt: async (req, res) => {
     const { extNo } = req.params;
-    console.log(extNo);
 
     const result = await customExtService.deleteCustomExt(extNo);
 
@@ -70,7 +80,7 @@ export default {
         msh: '차단된 확장자 삭제 성공',
       });
     } else {
-      throw new ValidationError('존재하지 않는 확장자 입니다.');
+      return new ValidationError('존재하지 않는 확장자 입니다.', 4001);
     }
   },
 };

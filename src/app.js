@@ -6,13 +6,10 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import xss from 'xss-clean';
-import mongoSanitize from 'express-mongo-sanitize';
 import './config/configLoading';
 import { NotFoundError } from './helpers/errors.helper';
 import errorHandler from './middlewares/errorHandler.middleware';
 import v1Router from './routes/v1/index.routes';
-
-console.log(process.env);
 
 const app = express();
 
@@ -50,7 +47,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Sanitize data
 app.use(xss());
-app.use(mongoSanitize());
 
 // GZIP compression
 app.use(compression());
@@ -61,14 +57,20 @@ app.use(cookieParser());
 // CORS policy configuration
 app.use(
   cors({
-    origin: true,
+    origin:
+      process.env.NODE_ENV === 'staging'
+        ? 'ec2-54-178-212-88.ap-northeast-1.compute.amazonaws.com:3000'
+        : true,
     credentials: true,
   }),
 );
 
-// view engine
-const template = path.join(__dirname, './views', 'index.html');
-
+// rendering view
+let viewPath = './views';
+if (process.env.NODE_ENV === 'staging') {
+  viewPath = '../src/views';
+}
+const template = path.join(__dirname, viewPath, 'index.html');
 app.get('/', function (req, res) {
   res.sendFile(template);
 });

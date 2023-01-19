@@ -7,14 +7,14 @@ import { config } from 'dotenv';
 config();
 
 export default (err, request, response, next) => {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isStaging = process.env.NODE_ENV === 'staging';
   let errorMessage = {};
 
   if (response.headersSent) {
     return next(err);
   }
 
-  if (!isProduction) {
+  if (!isStaging) {
     errorMessage = err;
     console.log('errMessage:', err);
   }
@@ -22,7 +22,6 @@ export default (err, request, response, next) => {
   return response.status(err.statusCode || 500).json({
     code: err.code || 5000,
     msg: err.msg || err.message,
-    ...(err.errors && { errors: err.errors }),
-    ...(!isProduction && { trace: errorMessage }),
+    ...(!isStaging && { trace: errorMessage }),
   });
 };
