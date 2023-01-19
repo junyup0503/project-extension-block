@@ -14,6 +14,19 @@ export default {
     return result;
   },
 
+  /** 고정 확장자 단일 조회
+   *
+   * @param {*} name
+   * @returns 조회된 고정 확장자
+   */
+  findOneFixedExt: async (name) => {
+    const result = await db.fixedExtension.findOne({
+      where: { name },
+    });
+
+    return result;
+  },
+
   checkFixedExt: async (no, isCheck) => {
     let result;
     if (isCheck) {

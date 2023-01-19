@@ -14,6 +14,16 @@ export default {
     return { count, rows };
   },
 
+  /**
+   *
+   * @returns 100 커스텀 확장자 총 갯수
+   */
+  countAllCustomExt: async () => {
+    const count = await db.customExtension.count();
+
+    return count;
+  },
+
   /** 차단된 확장자 단일 조회(확장자 이름으로 조회)
    *
    * @param {String} name
