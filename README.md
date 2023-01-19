@@ -4,7 +4,9 @@
 
 # 사용한 기술 스택
 back-end : node.js(express), mysql
+<br>
 front-end : vueJS
+<br>
 인프라 : aws ec2, aws RDS
 
 
