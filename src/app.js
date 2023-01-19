@@ -1,20 +1,18 @@
+import path from 'path';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import path from 'path';
 import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import xss from 'xss-clean';
 import mongoSanitize from 'express-mongo-sanitize';
+import './config/configLoading';
 import { NotFoundError } from './helpers/errors.helper';
 import errorHandler from './middlewares/errorHandler.middleware';
 import v1Router from './routes/v1/index.routes';
 
-if (process.env.NODE_ENV === 'development') {
-  dotenv.config({ path: path.join(__dirname, '../.env.local') });
-}
+console.log(process.env);
 
 const app = express();
 

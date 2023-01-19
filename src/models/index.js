@@ -6,6 +6,8 @@ import initModels from './init-models';
 const env = process.env.NODE_ENV || 'development';
 const config = sequelizeConfig[env];
 
+console.log(config);
+
 if (env === 'staging') {
   let auth = {};
   if (process.env.DATABASE_AUTHINFO) {
