@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/5.2.3/darkly/bootstrap.min.css" integrity="sha512-YRcmztDXzJQCCBk2YUiEAY+r74gu/c9UULMPTeLsAp/Tw5eXiGkYMPC4tc4Kp1jx/V9xjEOCVpBe4r6Lx6n5dA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+    <div class="container">
+      <div>
+        <div>
+          <div class="mt-5 mb-2">
+            고정 확장자 체크
+          </div>
+          <div class="form-check">
+            <span v-for="(ext, index) in fixedExtList" :key="index" style="display: inline-block; width:10%;">
+              <input class="form-check-input" type="checkbox" :checked="ext.isCheck" :id="`flexCheckDefault${index}`" @click="this.checkExt(ext.no, ext.isCheck, index)">
+              <label class="form-check-label" :for="`flexCheckDefault${index}`" @click="this.checkExt(ext.no, ext.isCheck, index)">
+                {{ext.name}}
+              </label>
+            </span>
+          </div>
+        </div>
+        
+        <div class="form-group has-success">
+          <label class="form-label mt-5" for="inputTag">커스텀 확장자 추가</label>
+          <br>
+          <input class="form-control" id="inputTag" v-model="this.inputCustom" type="text" placeholder="커스텀 확장자를 입력해주세요." >
+          <button type="button" class="btn btn-light" @click="blockExt(this.inputCustom)">추가</button>
+        </div>
+      </div>
+      <div class="card bg-white mb-3 mt-4" style="height: 500px;">
+        <div class="card-body">
+          <div style="color:black;">
+            {{this.customExtCnt}} / 200
+          </div>
+          <div v-for="(ext, index) in customExtList" :key="index" class="extBox">
+            <p class="pCustom">{{ext.name}}</p>
+            <button class="btnCustom" @click="unBlockExt(ext.no, index)">X</button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script type="module">
+  import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+  
+  createApp({
+    data() {
+      return {
+        fixedExtList: [],
+        customExtList: [],
+        customExtCnt: 0,
+
+        inputCustom: '',
+
+        host: window.location.host,
+      }
+    },
+    
+    //computed : data를 기반으로 하여 실시간 계산이 필요한 경우 작성한다.
+    // - 3줄보다 많다면 사용하지 않는 것을 권장한다(복잡한 계산 시 성능 저하가 발생)
+    computed:{
+        
+    },
+    //methods : 애플리케이션 내에서 언제든 호출 가능한 코드 집합이 필요한 경우 작성한다.
+    methods:{
+      async blockExt(name){
+        await axios({
+          url: `http://${this.host}/v1/api/extensions/block-custom`,
+          method: "post",
+          data: {
+            name
+          }
+        }).then(res => {
+          this.customExtList.push(res.data.data.ext);
+          this.customExtCnt++;
+          this.inputCustom = '';
+        })
+      },
+
+      async unBlockExt(no, index){
+        await axios({
+          url: `http://${this.host}/v1/api/extensions/block-custom/${no}`,
+          method: "delete",
+        }).then(res=>{
+          if(res.data.code===2000){
+            this.customExtList.splice(index, 1);
+            this.customExtCnt--;
+          }
+        })
+      },
+
+      async checkExt(no, isCheck, index) {
+        await axios({
+          url: 'http://'+this.host+'/v1/api/extensions/check-fixed',
+          method: 'post',
+          data: {
+            no,
+            isCheck
+          }
+        }).then(res=>{
+          if(res.data.code===2000){
+            this.fixedExtList[index].isCheck = !this.fixedExtList[index].isCheck;
+          }
+        })
+      },
+    },
+    //Lifecycle에 따른 시점 구분
+    beforeCreate(){
+        //데이터 및 구성요소 초기화 전
+        console.log("Vue 인스턴스 초기화 전");
+    },
+    created(){
+        //데이터 및 구성요소 초기화 후
+        //data에 접근 가능하므로 ajax를 여기서 사용하여 초기 데이터를 불러온다
+        axios({
+          url: 'http://'+this.host+'/v1/api/extensions',
+          method: 'get',
+        }).then(res=>{
+          console.log('성공', res.data);
+          const {fixedExt,customExt,customExtCnt } = res.data.data;
+
+          this.fixedExtList = fixedExt;
+          this.customExtList = customExt;
+          this.customExtCnt = customExtCnt; 
+        });
+
+        
+    },
+    beforeMount(){
+        //데이터가 화면에 마운트 되기 전(View 생성 전)
+        console.log("화면 생성 전");
+        var tag = document.querySelector(".test");
+        console.log(tag);
+    },
+    mounted(){
+        //데이터가 화면에 마운트 되기 후(View 생성 후)
+        console.log("화면 생성 후");
+        var tag = document.querySelector(".test");
+        console.log(tag);
+    },
+    beforeUpdate(){
+        console.log("업데이트 전");
+        var tag = document.querySelector(".result");
+        console.log(tag);
+    },
+    updated(){
+        console.log("업데이트 후");
+        var tag = document.querySelector(".result");
+        console.log(tag);
+    },
+  }).mount('#app')
+
+</script>
+
+
+<style>
+  .btn {
+    width: 10%;
+    margin-left: 10%;
+  }
+  #inputTag{
+    width:80%;
+    display: inline-block;
+  }
+  .extBox{
+    width: 7%;
+    height: 50px;
+    position: relative;
+    border: 1px solid black;
+    color: black;
+    display: inline-block;
+    padding: 10px 10px 15px 15px;
+    border-radius: 10%;
+    margin: 10px 10px 10px 10px;
+  }
+  .btnCustom {
+    position: absolute;
+    right: 2px;
+    background-color: white;
+    color: black;
+    border: none;
+  }
+  .pCustom {
+    display: inline;
+
+  }
+</style>
+
+</html>
