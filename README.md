@@ -24,8 +24,8 @@ front-end : vueJS
 [배포]
  - 
 
-<br><br><br><br>
+<br><br><br><br><br><br>
 
-설계 이미지
+# 설계 이미지
 <br>
 <img width="871" alt="Screen Shot 2023-01-20 at 1 54 16 AM" src="https://user-images.githubusercontent.com/97156898/213507894-7bb68063-5cbe-4974-ba00-e7a0b30bab19.png">
