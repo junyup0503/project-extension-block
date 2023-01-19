@@ -3,7 +3,7 @@ import Joi from 'joi';
 export const blockExtSchema = {
   body: Joi.object({
     name: Joi.string()
-      .regex(/^(?=.*[a-z])[0-9a-z]{1,20}$/, 'regex')
+      .regex(/^(?=.*[a-zA-Z])[0-9a-zA-Z]{1,20}$/, 'regex')
       .required(),
   }),
 };

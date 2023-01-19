@@ -38,7 +38,7 @@ export default {
 
   // 차단된 확장자 추가
   blockExt: async (req, res, next) => {
-    const { name } = req.body;
+    const name = req.body.name.toLowerCase();
 
     // 최대 갯수 검사
     const count = await customExtService.countAllCustomExt();
