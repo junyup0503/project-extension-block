@@ -15,22 +15,7 @@ const app = express();
 
 app.set('trust proxy', true);
 
-app.use(
-  morgan(
-    `:remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length]  :response-time ms ":referrer" ":user-agent"`,
-    {
-      skip(req) {
-        if (req.method === 'OPTIONS') {
-          return true;
-        }
-        if (req.originalUrl === '/health') {
-          return true;
-        }
-        return false;
-      },
-    },
-  ),
-);
+app.use(morgan('combined'));
 
 // Set security HTTP Headers
 app.use(
@@ -75,13 +60,10 @@ app.get('/', function (req, res) {
   res.sendFile(template);
 });
 
-// ALB healthcheck
-app.get('/health', function (req, res) {
-  return res.status(200).send('ok');
-});
-
+// routing
 app.use('/v1/api', v1Router);
 
+// Error Handler
 app.all('*', (_, res) => {
   throw new NotFoundError('Resource not found on this server!!');
 });

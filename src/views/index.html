@@ -20,7 +20,7 @@
           <div v-if="this.varMount>0" class="form-check">
             <span v-for="(ext, index) in fixedExtList" :key="index" style="display: inline-block; width:10%;">
               <input class="form-check-input" type="checkbox" :checked="ext.isCheck" :id="`flexCheckDefault${index}`" @click="this.checkExt(ext.no, ext.isCheck, index)">
-              <label class="form-check-label" :for="`flexCheckDefault${index}`" @click="this.checkExt(ext.no, ext.isCheck, index)">
+              <label class="form-check-label" :for="`flexCheckDefault${index}`">
                 {{ext.name}}
               </label>
             </span>
