@@ -1,6 +1,6 @@
 # 플로우 서버 개발자 과제입니다.
 
-사이트 주소 : http://ec2-54-178-212-88.ap-northeast-1.compute.amazonaws.com:3000/
+
 <br><br>
 # 사용한 기술 스택
 back-end : node.js(express), mysql
